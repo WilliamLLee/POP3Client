@@ -135,8 +135,9 @@ class POP3:
     
     def quit(self):
         resp = self._shortcmd('QUIT')
-        self.__socket.close()
-        del self.__socket
+        if self.__socket:
+            self.__socket.close()
+            del self.__socket
         return resp
         
 

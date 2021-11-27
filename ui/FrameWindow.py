@@ -209,6 +209,9 @@ class MainFrameWindow(QWidget):
         if self.debug_flag:
             print("Logout button is clicked!")
         self.set_state_info("Logout...")
+        if self.device_valid == False:
+            self.set_state_info("Please start the device first!")
+            return
         self.log(">>>"+"QUIT")
         try:
             quit_resp = self.pop3_device.quit()
