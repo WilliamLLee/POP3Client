@@ -10,65 +10,6 @@ import threading
 from config.config  import *
 from tools import utls
 
-# class PacketsAnalyzer(QDialog):
-#     def __init__(self, main_window, results):
-#         """
-#         Initialization function
-#         :param main_window: main windows object
-#         """
-#         super().__init__()
-#         self.setWindowTitle('Packets Analysis')
-#         self.main_window = main_window
-#         self.table = QVBoxLayout()
-#         self.results = results
-#         self.__init_ui()
-
-#     def __init_ui(self):
-#         # Set window size
-#         diglog_size = QSize(600,400)
-#         self.setFixedSize(diglog_size)
-#         # Set window icon
-#         self.setWindowIcon(QIcon('icon.ico'))
-        
-#         # v Box Layout container
-#         left_container = QVBoxLayout()
-#         right_container = QVBoxLayout()
-#         # Set information display
-#         self.total_count, self.protocol_dic, self.service_dic = func.packet_count_func(self.results)
-#         self.tcp_udp_count = 0
-#         if 'TCP' in self.protocol_dic.keys():
-#                 self.tcp_udp_count += self.protocol_dic['TCP']
-#         if 'UDP' in self.protocol_dic.keys():
-#                 self.tcp_udp_count += self.protocol_dic['UDP']
-        
-#         print(self.total_count, self.tcp_udp_count, self.protocol_dic, self.service_dic)
-        
-#         left_container.addWidget(QLabel("Count By Session Protocol:"))
-#         left_container.addWidget(QLabel("Total Packet Count: {}".format(self.total_count)))
-#         right_container.addWidget(QLabel("Count By Application Service:"))
-#         right_container.addWidget(QLabel("Total TCP/UDP Count: {}".format(self.tcp_udp_count)))
-#         for protocol in func.protocol_list:
-#                 if protocol in self.protocol_dic.keys():
-#                         left_container.addWidget(QLabel(protocol+":"+str(self.protocol_dic[protocol])+"(%.2f)"%(self.protocol_dic[protocol]/self.total_count)))
-#                 else:
-#                         left_container.addWidget(QLabel(protocol+":"+"0"))
-#         for service in func.service_list:
-#                 if self.tcp_udp_count!=0 and service in self.service_dic.keys():
-#                         right_container.addWidget(QLabel(service+":"+str(self.service_dic[service])+"(%.2f)"%(self.service_dic[service]/self.tcp_udp_count)))
-#                 else:
-#                         right_container.addWidget(QLabel(service+":"+"0"))
-
-
-#         total_container = QHBoxLayout()
-#         total_container.addLayout(left_container)
-#         total_container.addLayout(right_container)
-
-#         self.table.addLayout(total_container)
-#         self.setLayout(self.table)
-#         self.adjustSize()
-#         self.show()
-
-
 class MainFrameWindow(QWidget):
     '''
         design the main frame window
