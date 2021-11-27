@@ -1,7 +1,19 @@
 import socket as sk
 
-from config.config  import CRLF, CR, _MAXLINE
-from pop3_yuanjing import error_proto
+from config.config  import CRLF, CR, MAXLINE
+
+
+def get_ip_address(hostname=None):
+    '''
+    Get the IP address of the hostname.
+    hostname: the hostname of the target.
+    '''
+    assert(hostname is not None)
+    try:
+        ip_address = sk.gethostbyname(hostname)
+    except sk.gaierror:
+        ip_address = 'Unknown'
+    return ip_address
 
 
 class error_proto(Exception):
@@ -15,7 +27,7 @@ class POP3:
 
         Minimal Command Set:
             USER name       user(name)
-            PASS string     pass(string)
+            PASS string     pass_(string)
             STAT            state()
             LIST [msg]      list(msg = None)
             RETR msg        retr(msg)
@@ -27,7 +39,7 @@ class POP3:
             POP3(hostname, port=110)
     '''
 
-    def __init__(self, hostname, port=110, is_debug=False, encoding = 'utf-8', timeout=sk.__GLOBAL_DEFAULT_TIMEOUT__):
+    def __init__(self, hostname, port=110, is_debug=False, encoding = 'utf-8', timeout=50):
         self.__hostname = hostname
         self.__port = port
         self.__socket = self._create_socket(timeout)
@@ -43,15 +55,16 @@ class POP3:
 
     def _putline(self, line):
         if self.__debugging: print('>>>', repr(line))
-        self.__socket.sendall(line.encode(self.__encoding) + CRLF)
+        self.__socket.sendall(line + CRLF)
 
     def _putcmd(self, line):
         if self.__debugging: print('>>>', repr(line))
         line  = bytes(line, self.__encoding)
+        self._putline(line)
 
     def _get_line(self):
-        line = self.__file.readline(_MAXLINE + 1)
-        if len(line) > _MAXLINE:
+        line = self.__file.readline(MAXLINE + 1)
+        if len(line) > MAXLINE:
             raise ValueError('line too long')
 
         if self.__debugging: print('<<<', repr(line))
@@ -78,20 +91,16 @@ class POP3:
 
     def _getlongresp(self):
         resp = self._getresp()
-        list = [], octets = 0
-        if resp == '+OK':
-            while 1:
-                line = self.__file.readline(_MAXLINE + 1)
-                if len(line) > _MAXLINE:
-                    raise ValueError('line too long')
-                if self.__debugging: print('<<<', repr(line))
-                if not line:
-                    raise error_proto('-ERR EOF')
-                if line == CRLF:
-                    break
-                list.append(line)
-                octets = octets + len(line)
-        return resp, list, octets
+        list = []; octets = 0
+        line, o = self._get_line()
+        while line != '.':
+            if line.startswith('..'):
+                o = o-1
+                line = line[1:]
+            octets = octets + o
+            list.append(line)
+            line, o = self._get_line()
+        return resp, list, octets  # the octets means the number of bytes in the message
 
     def _shortcmd(self, line):
         self._putcmd(line)
@@ -129,31 +138,7 @@ class POP3:
         self.__socket.close()
         del self.__socket
         return resp
-    
-    def close(self):
-        '''
-            close the connection
-        '''
-        try:
-            file = self.__file
-            self.__file = None
-            if file: file.close()
-        finally:
-            socket = self.__socket
-            self.__socket = None
-            if  socket : 
-                try:
-                    socket.shutdown(sk.SHUT_RDWR)
-                except OSError as e:
-                    # The server might already have closed the connection
-                    if e.errno != sk.ENOTCONN:
-                        raise
-                finally:
-                    socket.close() 
         
-    # del self.__socket
-    def __del__(self):
-        self.close()
 
 
     

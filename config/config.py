@@ -7,17 +7,21 @@ encoding = 'utf-8'
 # icon path
 ICON_PATH = './icon.ico'
 
+
+############################ attemp to connect to server ###############################
 # Email address
-MAILADDR = ''
+MAILADDR = ''  # if you want to  run the program under debug mode, you must set the email address here.
 
-# Password of email address
-MAILPASS = ''
+# Password of email address, 
+# this requires authorization from the mail service provider
+MAILPASS = ''  # if you want to  run the program under debug mode, you must set the password here.
 
+########################################################################################
 # POP3 server
-POP3SERVER = ''
+POP3SERVER = 'pop.163.com'
 
 # Port of POP3 server
-POP3PORT = ''
+POP3PORT = '110'
 
 # retr number
 RETRNUM = ''
