@@ -1,5 +1,5 @@
 import socket as sk
-
+import ssl 
 from config.config  import CRLF, CR, MAXLINE
 
 
@@ -39,7 +39,7 @@ class POP3:
             POP3(hostname, port=110)
     '''
 
-    def __init__(self, hostname, port=110, is_debug=False, encoding = 'utf-8', timeout=50):
+    def __init__(self, hostname, port='110', is_debug=False, encoding = 'utf-8', timeout=50):
         self.__hostname = hostname
         self.__port = port
         self.__socket = self._create_socket(timeout)
@@ -50,8 +50,14 @@ class POP3:
         self.__encoding = encoding
         self.welcome = self._getresp()  # welcome message
 
-    def _create_socket(self, timeout):
-        return sk.create_connection((self.__hostname, self.__port), timeout)
+    def _create_socket(self, timeout, cafile=None):
+        if self.__port == '995':
+            purpose = ssl.Purpose.SERVER_AUTH
+            context = ssl.create_default_context(purpose,cafile=cafile)
+        raw_socket =  sk.create_connection((self.__hostname, self.__port), timeout)
+        if self.__port == '995':
+            raw_socket = context.wrap_socket(raw_socket, server_hostname=self.__hostname)
+        return raw_socket
 
     def _putline(self, line):
         if self.__debugging: print('>>>', repr(line))
@@ -134,8 +140,9 @@ class POP3:
         return self._shortcmd('LIST %s' % msg)
     
     def quit(self):
-        resp = self._shortcmd('QUIT')
+        resp = 'No TCP Connection.'
         if self.__socket:
+            resp = self._shortcmd('QUIT')
             self.__socket.close()
             del self.__socket
         return resp

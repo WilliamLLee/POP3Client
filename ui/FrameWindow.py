@@ -77,6 +77,9 @@ class MainFrameWindow(QWidget):
         # set the log_text
         self.log_text = ""
 
+        # set the pop3 device valid flag as false
+        self.device_valid = False
+
         if self.debug_flag:
             print("Debug mode is set now!")
 
@@ -175,14 +178,21 @@ class MainFrameWindow(QWidget):
     def login_button_clicked(self):
         if self.debug_flag:
             print("Login button is clicked!")
+
+        if self.device_valid == True:
+            self.set_state_info("You are already logged in!")
+            return
+
         try:
             self.start_button_clicked() 
         except Exception as e:
             self.set_state_info(str(e))
             return
+
         if self.device_valid == False:
-            self.set_state_info("Please start the device first!")
+            self.set_state_info("You should logged in first!")
             return
+
         if self.mail_address.text() == "" or self.mail_password.text() == "":
             self.state_info.setText("Please input the mail address and password!")
             return
@@ -265,8 +275,8 @@ class MainFrameWindow(QWidget):
         
         if self.get_msg_arg() == "":
             self.log("<<<"+str(list_resp[0]))
-            total_info = list_resp[0]
-            self.set_mail_info("total mails (#): %s \tMemory size (bytes): %s"%(total_info[1], total_info[2]))
+            total_info = list_resp[0].split(" ")
+            self.set_mail_info("total mails (#): %s Memory size (bytes): %s"%(total_info[1], total_info[2]))
             for i in range(len(list_resp[1])):
                 self.log(""+str(list_resp[1][i]))
                 info_list = list_resp[1][i].split(" ")
